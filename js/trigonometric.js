@@ -48,6 +48,11 @@
 			};
 			return obj[axis];
 		};
+		self.getAngle = function (x, y) {
+			var dx = x - self.x;
+			var dy = y - self.y;
+			return Math.atan2(dy, dx) * 100 / Math.PI;
+		};
 	};
 
 	var Moon = function () {
@@ -71,17 +76,56 @@
 				degree++;
 			}, 10);
 		};
-		self.drag = function () {
+		self.drag = function (stage, parent) {
 			var self = this;
-			self.shape.addEventListener('mousedown', function (e) {
-				console.log('mousedown');
+			self.shape.onPress = function (e) {
+				console.log('mouse press')
+				e.onMouseMove = function (e) {
+					console.dir(e)
+					console.dir(parent)
+					var mx = e.stageX;
+					var my = e.stageY;
 
-				self.shape
-				.addEventListener('mousemove', function (e) {
-					console.log('mousemove');
+					var newRadius = self.getDistance(parent.x, parent.y, mx, my);
 
-				})
-			});
+					// parent.shape.regX = parent.x;
+					// parent.shape.x = parent.x
+
+					// parent.shape.scaleX = 2
+					// parent.shape.regY = parent.y;
+					var scale = newRadius / parent.radius;
+					parent.shape.setTransform(parent.x, parent.y, scale, scale, 0, 0, 0, parent.x, parent.y);
+					parent.radius = newRadius;
+
+					self.shape.x = parent.getPosition('x', 30) - self.x;
+					self.shape.y = parent.getPosition('y', 30) - self.y;
+
+					stage.update();
+
+					// var scale = 
+
+					console.log('mouse move');
+				};
+				e.onMouseUp = function (e) {
+					console.log('mouse up');
+				};
+			};
+			// self.shape.onClick('mousedown', function (e) {
+			// 	console.log('mousedown');
+
+			// 	console.dir(e)
+
+			// 	e.target
+			// 	.addEventListener('mousemove', function (e) {
+			// 		console.log('mousemove');
+
+			// 	})
+			// });
+		};
+		self.getDistance = function (x1, y1, x2, y2) {
+			var dx = x2 - x1;
+			var dy = y2 - y1;
+			return Math.sqrt(Math.pow(dx, 2) + Math.pow(dy, 2));
 		};
 	};
 
@@ -99,7 +143,7 @@
 	var moon = new Moon();
 	moon.draw(15, circle.getPosition('x', 30), circle.getPosition('y', 30));
 	// moon.animation(canvas.stage, circle);
-	moon.drag();
+	moon.drag(canvas.stage, circle);
 
 	canvas.stage.addChild(bg.shape);
 	canvas.stage.addChild(circle.shape);
