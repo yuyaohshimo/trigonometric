@@ -62,6 +62,27 @@
 			.drawCircle(self.x, self.y, radius)
 			.endFill();
 		};
+		self.animation = function (stage, parent) {
+			var degree = 0;
+			var timer = setInterval(function () {
+				self.shape.x = parent.getPosition('x', degree) - self.x;
+				self.shape.y = parent.getPosition('y', degree) - self.y;
+				stage.update();
+				degree++;
+			}, 10);
+		};
+		self.drag = function () {
+			var self = this;
+			self.shape.addEventListener('mousedown', function (e) {
+				console.log('mousedown');
+
+				self.shape
+				.addEventListener('mousemove', function (e) {
+					console.log('mousemove');
+
+				})
+			});
+		};
 	};
 
 	var canvas = new Canvas('main');
@@ -74,9 +95,11 @@
 	var circle = new Circle();
 	circle.draw(100, canvas.centerX, canvas.centerY);
 
+	// moon
 	var moon = new Moon();
 	moon.draw(15, circle.getPosition('x', 30), circle.getPosition('y', 30));
-	
+	// moon.animation(canvas.stage, circle);
+	moon.drag();
 
 	canvas.stage.addChild(bg.shape);
 	canvas.stage.addChild(circle.shape);
