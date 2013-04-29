@@ -40,11 +40,14 @@
 			.beginStroke('#999')
 			.drawCircle(self.x, self.y, radius);
 		};
-		self.getPosition = function (axis, degree) {
+		self.getPosition = function (axis, degree, radius) {
+			if (!radius) {
+				radius = self.radius;
+			}
 			var angle = (degree - 90) * Math.PI / 180;
 			var obj = {
-				x: self.x + Math.cos(angle) * self.radius,
-				y: self.y + Math.sin(angle) * self.radius
+				x: self.x + Math.cos(angle) * radius,
+				y: self.y + Math.sin(angle) * radius
 			};
 			return obj[axis];
 		};
@@ -87,18 +90,21 @@
 					var my = e.stageY;
 
 					var newRadius = self.getDistance(parent.x, parent.y, mx, my);
-
-					// parent.shape.regX = parent.x;
-					// parent.shape.x = parent.x
-
-					// parent.shape.scaleX = 2
-					// parent.shape.regY = parent.y;
 					var scale = newRadius / parent.radius;
-					parent.shape.setTransform(parent.x, parent.y, scale, scale, 0, 0, 0, parent.x, parent.y);
-					parent.radius = newRadius;
 
-					self.shape.x = parent.getPosition('x', 30) - self.x;
-					self.shape.y = parent.getPosition('y', 30) - self.y;
+					var angle = parent.getAngle(mx, my);
+					
+
+					console.log('scale: ', scale);
+					console.log('angle: ', angle);
+
+
+					parent.shape.scaleX = parent.shape.scaleY = scale;
+					parent.shape.regX = parent.shape.x = parent.x;
+					parent.shape.regY = parent.shape.y = parent.y;
+
+					self.shape.x = parent.getPosition('x', angle, newRadius) - self.x;
+					self.shape.y = parent.getPosition('y', angle, newRadius) - self.y;
 
 					stage.update();
 
